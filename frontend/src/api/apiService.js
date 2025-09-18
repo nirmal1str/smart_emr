@@ -10,11 +10,10 @@ export const getPatients = () => api.get('/patients');
 export const createPatient = (patientData) => api.post('/patients', patientData);
 export const getPatientDetails = (patientId) => api.get(`/patients/${patientId}`);
 export const deletePatient = (patientId) => api.delete(`/patients/${patientId}`);
-
-// --- ADD THIS NEW FUNCTION ---
-// It sends the patient's ID and the note content to the backend.
 export const addClinicalNote = (patientId, noteContent) => 
   api.post(`/patients/${patientId}/notes`, { content: noteContent });
 
-// This function for the AI summary might not be used yet, but it's good to have
+export const deleteClinicalNote = (patientId, noteId) => 
+  api.delete(`/patients/${patientId}/notes/${noteId}`);
+
 export const getAiSummary = (patientId) => api.get(`/patients/${patientId}/summary`);

@@ -11,17 +11,15 @@
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
-/* This targets the card div itself */
 .patient-card {
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
-/* --- THE NEW DELETE BUTTON STYLE --- */
 .delete-button {
-    background-color: #fee2e2; /* Light red background */
-    color: #b91c1c; /* Dark red text */
+    background-color: #fee2e2;
+    color: #b91c1c;
     border: none;
     border-radius: 6px;
     padding: 8px 12px;
@@ -29,16 +27,14 @@
     font-weight: 500;
     cursor: pointer;
     transition: background-color 0.2s ease, color 0.2s ease;
-    /* This makes sure the button stays on the right and doesn't stretch */
     flex-shrink: 0; 
 }
 
 .delete-button:hover {
-    background-color: #ef4444; /* Brighter red on hover */
-    color: #ffffff; /* White text on hover */
+    background-color: #ef4444;
+    color: #ffffff;
 }
 
-/* --- STYLES FOR THE DETAILS PAGE --- */
 .page-subtitle {
     margin-top: -10px;
     color: #6b7280;
@@ -62,6 +58,32 @@
     margin-top: 40px;
 }
 
+.note-form {
+    margin-bottom: 24px;
+}
+
+.note-textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 16px;
+    font-family: inherit;
+    margin-bottom: 12px;
+    resize: vertical;
+}
+
+.note-textarea:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 1px #3b82f6;
+}
+
+.note-form .nav-button {
+    width: auto;
+    cursor: pointer;
+}
+
 .notes-list {
     list-style: none;
     padding: 0;
@@ -73,5 +95,34 @@
     border-radius: 8px;
     padding: 16px;
     margin-bottom: 12px;
-    white-space: pre-wrap; /* This preserves line breaks in the notes */
+    white-space: pre-wrap;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+}
+
+.note-content {
+    flex-grow: 1;
+}
+
+.note-delete-button {
+    background: #fee2e2;
+    color: #ef4444;
+    border: none;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    font-size: 20px;
+    font-weight: bold;
+    line-height: 28px;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s;
+    flex-shrink: 0;
+}
+
+.note-delete-button:hover {
+    background: #ef4444;
+    color: white;
 }

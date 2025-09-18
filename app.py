@@ -1,5 +1,3 @@
-# app.py
-
 import os
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
@@ -72,9 +70,7 @@ def get_patient_details(patient_id):
 
 @app.route('/api/patients/<int:patient_id>', methods=['DELETE'])
 def delete_patient(patient_id):
-    # This is the corrected version that uses modern SQLAlchemy and does NOT use get_db_connection
     patient_to_delete = db.get_or_404(Patient, patient_id)
-
     try:
         db.session.delete(patient_to_delete)
         db.session.commit()
@@ -95,6 +91,23 @@ def add_note(patient_id):
     db.session.add(new_note)
     db.session.commit()
     return jsonify(new_note.to_dict()), 201
+
+@app.route('/api/patients/<int:patient_id>/notes/<int:note_id>', methods=['DELETE'])
+def delete_note(patient_id, note_id):
+    # This function is now corrected to use the modern db.session.get method
+    note = db.session.get(Note, note_id)
+
+    # Verify the note exists and actually belongs to the correct patient
+    if not note or note.patient_id != patient_id:
+        return jsonify({"error": "Note not found or does not belong to this patient"}), 404
+
+    try:
+        db.session.delete(note)
+        db.session.commit()
+        return jsonify({"message": "Note deleted successfully"}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": str(e)}), 500
 
 @app.route('/api/patients/<int:patient_id>/summary', methods=['GET'])
 def get_summary(patient_id):
