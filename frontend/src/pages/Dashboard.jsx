@@ -50,7 +50,7 @@ const Dashboard = () => {
   if (error) return <div className="max-w-3xl mx-auto"><ErrorMessage message={error} /></div>;
 
   return (
-    <div className="max-w-5xl mx-auto mt-10">
+    <div className="max-w-5xl mx-auto mt-10 p-6 bg-white dark:bg-gray-900 rounded-lg shadow-xl">
       {/* Header with search bar and animated button */}
       <div className="flex items-center justify-between mb-8">
         <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-200">All Patients</h1>

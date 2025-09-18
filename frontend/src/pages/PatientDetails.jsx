@@ -134,71 +134,89 @@ const PatientDetails = () => {
             title: {
                 display: true,
                 text: 'Patient Health Trend Over Time',
+                color: 'rgb(156, 163, 175)', // Dark mode title color
             },
         },
+        scales: {
+            x: {
+                ticks: {
+                    color: 'rgb(156, 163, 175)', // Dark mode x-axis labels
+                },
+                grid: {
+                    color: 'rgba(255, 255, 255, 0.1)', // Dark mode grid lines
+                }
+            },
+            y: {
+                ticks: {
+                    color: 'rgb(156, 163, 175)', // Dark mode y-axis labels
+                },
+                grid: {
+                    color: 'rgba(255, 255, 255, 0.1)', // Dark mode grid lines
+                }
+            }
+        }
     };
 
 
     if (loading) return <LoadingSpinner />;
-    if (error) return <div className="container"><ErrorMessage message={error} /></div>;
-    if (!patient) return <div className="container"><p>Patient not found.</p></div>;
+    if (error) return <div className="max-w-4xl mx-auto p-6"><ErrorMessage message={error} /></div>;
+    if (!patient) return <div className="max-w-4xl mx-auto p-6"><p className="text-gray-900 dark:text-gray-50">Patient not found.</p></div>;
 
     return (
-        <div className="container">
-            <div className="page-header">
-                <h1 className="page-title">{patient.name}</h1>
-                <div className="header-actions">
-                    <Link to="/" className="nav-button-secondary">
+        <div className="max-w-4xl mx-auto p-6">
+            <div className="flex justify-between items-center mb-6">
+                <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-200">{patient.name}</h1>
+                <div className="flex space-x-4">
+                    <Link to="/" className="text-blue-600 hover:text-blue-800 font-medium dark:text-blue-400 dark:hover:text-blue-200">
                         ← Back to All Patients
                     </Link>
-                    <button onClick={handleGetSummary} className="nav-button" disabled={summaryLoading}>
+                    <button onClick={handleGetSummary} className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition dark:bg-green-700 dark:hover:bg-green-600" disabled={summaryLoading}>
                         {summaryLoading ? 'Generating...' : 'Get AI Summary'}
                     </button>
-                    <button onClick={handleGetAnalysis} className="nav-button" disabled={analysisLoading}>
+                    <button onClick={handleGetAnalysis} className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition dark:bg-purple-700 dark:hover:bg-purple-600" disabled={analysisLoading}>
                         {analysisLoading ? 'Analyzing...' : 'Get Predictive Analysis'}
                     </button>
                 </div>
             </div>
-
-            <div className="patient-details-grid">
+            
+            <div className="grid grid-cols-2 gap-4 mb-8 bg-white shadow-md rounded-xl p-5 dark:bg-gray-800">
                 <div className="detail-item">
-                    <span className="detail-label">Date of Birth</span>
-                    <span className="detail-value">{patient.dob}</span>
+                    <span className="detail-label text-gray-500 dark:text-gray-400">Date of Birth</span>
+                    <span className="detail-value text-gray-800 dark:text-gray-200">{patient.dob}</span>
                 </div>
                 <div className="detail-item">
-                    <span className="detail-label">Gender</span>
-                    <span className="detail-value">{patient.gender}</span>
+                    <span className="detail-label text-gray-500 dark:text-gray-400">Gender</span>
+                    <span className="detail-value text-gray-800 dark:text-gray-200">{patient.gender}</span>
                 </div>
                 <div className="detail-item">
-                    <span className="detail-label">Blood Type</span>
-                    <span className="detail-value">{patient.blood_type}</span>
+                    <span className="detail-label text-gray-500 dark:text-gray-400">Blood Type</span>
+                    <span className="detail-value text-gray-800 dark:text-gray-200">{patient.blood_type}</span>
                 </div>
                 <div className="detail-item">
-                    <span className="detail-label">Contact</span>
-                    <span className="detail-value">{patient.contact_number}</span>
+                    <span className="detail-label text-gray-500 dark:text-gray-400">Contact</span>
+                    <span className="detail-value text-gray-800 dark:text-gray-200">{patient.contact_number}</span>
                 </div>
             </div>
 
             {(summaryLoading || summary) && (
-                <div className="summary-section">
-                    <h2>AI-Generated Summary</h2>
+                <div className="bg-white shadow-md rounded-xl p-5 dark:bg-gray-800 mb-8">
+                    <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-4">AI-Generated Summary</h2>
                     {summaryLoading ? (
-                        <div className="summary-loading">
+                        <div className="flex items-center justify-center space-x-2 text-gray-600 dark:text-gray-300">
                             <LoadingSpinner />
                             <p>Analyzing notes...</p>
                         </div>
                     ) : (
-                        <p className="summary-content">{summary}</p>
+                        <p className="text-gray-800 dark:text-gray-200">{summary}</p>
                     )}
                 </div>
             )}
             
-            {/* New section for predictive analysis chart */}
             {(analysisLoading || analysis) && (
-                <div className="summary-section">
-                    <h2>AI-Generated Predictive Analysis</h2>
+                <div className="bg-white shadow-md rounded-xl p-5 dark:bg-gray-800 mb-8">
+                    <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-4">AI-Generated Predictive Analysis</h2>
                     {analysisLoading ? (
-                        <div className="summary-loading">
+                        <div className="flex items-center justify-center space-x-2 text-gray-600 dark:text-gray-300">
                             <LoadingSpinner />
                             <p>Predicting trends...</p>
                         </div>
@@ -212,24 +230,40 @@ const PatientDetails = () => {
                 </div>
             )}
 
-            <div className="notes-section">
-                <h2>Clinical Notes</h2>
-                <form onSubmit={handleNoteSubmit} className="note-form">
-                    <textarea value={newNote} onChange={(e) => setNewNote(e.target.value)} placeholder="Add a new clinical note..." className="note-textarea" rows="4"/>
-                    <button type="submit" className="nav-button">Save Note</button>
-                </form>
-                {patient.notes && patient.notes.length > 0 ? (
-                    <ul className="notes-list">
-                        {patient.notes.map(note => (
-                            <li key={note.id} className="note-item">
-                                <span className="note-content">{note.content}</span>
-                                <button onClick={() => handleDeleteNote(note.id)} className="note-delete-button">&times;</button>
-                            </li>
-                        ))}
-                    </ul>
-                ) : (
-                    <p>No clinical notes have been added for this patient.</p>
-                )}
+            <div className="bg-white shadow-md rounded-xl p-5 dark:bg-gray-800 mb-8">
+                <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-4">Clinical Notes</h2>
+                <div className="space-y-4">
+                    {patient.notes && patient.notes.length > 0 ? (
+                        <ul className="notes-list space-y-3">
+                            {patient.notes.map(note => (
+                                <li key={note.id} className="bg-gray-100 p-3 rounded-lg flex justify-between items-center dark:bg-gray-700">
+                                    <span className="note-content text-gray-800 dark:text-gray-200">{note.content}</span>
+                                    <button onClick={() => handleDeleteNote(note.id)} className="note-delete-button text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300">&times;</button>
+                                </li>
+                            ))}
+                        </ul>
+                    ) : (
+                        <p className="text-gray-500 dark:text-gray-400">No clinical notes have been added for this patient.</p>
+                    )}
+                </div>
+                <div className="mt-6">
+                    <form onSubmit={handleNoteSubmit} className="flex flex-col space-y-4">
+                        <textarea
+                            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500"
+                            rows="4"
+                            placeholder="Add a new clinical note..."
+                            value={newNote}
+                            onChange={(e) => setNewNote(e.target.value)}
+                            required
+                        ></textarea>
+                        <button
+                            type="submit"
+                            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition dark:bg-blue-700 dark:hover:bg-blue-600"
+                        >
+                            Save Note
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
     );
