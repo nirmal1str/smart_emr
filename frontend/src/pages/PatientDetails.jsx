@@ -31,17 +31,22 @@ const PatientDetails = () => {
   const handleAddNote = async (e) => {
     e.preventDefault();
     if (!noteContent.trim()) return;
+
     setIsAddingNote(true);
     try {
       const response = await addClinicalNote(patientId, noteContent);
-      setPatient(response.data);
-      setNoteContent('');
-      setIsAddingNote(false);
+      setPatient(currentPatient => ({
+        ...currentPatient,
+        notes: [...currentPatient.notes, response.data]
+      }));
+
+      setNoteContent(''); 
     } catch (err) {
       alert("Failed to add note.");
+    } finally {
       setIsAddingNote(false);
     }
-  };
+};
 
   const handleGetSummary = async () => {
     setIsFetchingSummary(true);
@@ -87,10 +92,10 @@ const PatientDetails = () => {
           </button>
         </form>
         <ul className="notes-list" style={{ marginTop: '1rem', padding: '0' }}>
-          {patient.notes.length > 0 ? (
+          {patient && patient.notes && patient.notes.length > 0 ? (
             patient.notes.map((note, index) => (
               <li key={index} className="note-item" style={{ marginBottom: '0.5rem' }}>
-                <p style={{ color: '#374151' }}>{note}</p>
+                <p style={{ color: '#374151' }}>{note.content}</p>
               </li>
             ))
           ) : (
@@ -117,5 +122,22 @@ const PatientDetails = () => {
     </div>
   );
 };
+
+
+const handleDeleteNote = async (noteId) => {
+    if (window.confirm('Are you sure you want to delete this note?')) {
+        try {
+            await apiService.deleteNote(patientId, noteId);
+            setNotes(notes.filter(note => note.id !== noteId));
+        } catch (error) {
+            console.error('Failed to delete note:', error);
+        }
+    }
+};
+
+// ... inside the return statement, inside the notes.map(), add this button
+<button className="delete-note-button" onClick={() => handleDeleteNote(note.id)}>
+    Delete Note
+</button>
 
 export default PatientDetails;

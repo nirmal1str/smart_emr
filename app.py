@@ -127,3 +127,39 @@ def init_db_command():
     """Creates the database tables."""
     db.create_all()
     print("Initialized the database.")
+
+
+
+@app.route('/api/patients/<int:patient_id>', methods=['DELETE'])
+def delete_patient(patient_id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    try:
+        cursor.execute("DELETE FROM patients WHERE id = ?", (patient_id,))
+        cursor.execute("DELETE FROM notes WHERE patient_id = ?", (patient_id,))
+        conn.commit()
+        return jsonify({"message": f"Patient with ID {patient_id} and all notes deleted successfully."}), 200
+    except Exception as e:
+        conn.rollback()
+        return jsonify({"error": str(e)}), 500
+    finally:
+        conn.close()
+
+@app.route('/api/patients/<int:patient_id>/notes/<int:note_id>', methods=['DELETE'])
+def delete_note(patient_id, note_id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    try:
+        cursor.execute("DELETE FROM notes WHERE id = ? AND patient_id = ?", (note_id, patient_id))
+        conn.commit()
+        if cursor.rowcount == 0:
+            return jsonify({"error": "Note not found or does not belong to the patient."}), 404
+            
+        return jsonify({"message": f"Note with ID {note_id} deleted successfully."}), 200
+    except Exception as e:
+        conn.rollback()
+        return jsonify({"error": str(e)}), 500
+    finally:
+        conn.close()
