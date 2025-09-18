@@ -3,10 +3,12 @@
 import os
 from flask import Flask, request, jsonify, render_template
 from flask_sqlalchemy import SQLAlchemy
+from flask_cors import CORS 
 import openai
 
 # --- CONFIGURATION ---
 app = Flask(__name__)
+CORS(app)  # <-- AND ADD THIS LINE
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///emr.db' # This creates the DB file
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
