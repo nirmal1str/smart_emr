@@ -9,11 +9,11 @@ const api = axios.create({
 export const getPatients = () => api.get('/patients');
 export const createPatient = (patientData) => api.post('/patients', patientData);
 export const getPatientDetails = (patientId) => api.get(`/patients/${patientId}`);
+export const addClinicalNote = (patientId, noteContent) => api.post(`/patients/${patientId}/notes`, { content: noteContent });
+export const getAiSummary = (patientId) => api.get(`/patients/${patientId}/summary-gemini`);
+export const getPredictiveAnalysis = (patientId) => api.get(`/patients/${patientId}/predictive-analysis`);
 export const deletePatient = (patientId) => api.delete(`/patients/${patientId}`);
-export const addClinicalNote = (patientId, noteContent) => 
-  api.post(`/patients/${patientId}/notes`, { content: noteContent });
+export const deleteNote = (patientId, noteId) => api.delete(`/patients/${patientId}/notes/${noteId}`);
 
-export const deleteClinicalNote = (patientId, noteId) => 
-  api.delete(`/patients/${patientId}/notes/${noteId}`);
-
-export const getAiSummary = (patientId) => api.get(`/patients/${patientId}/summary`);
+// New function to search patients
+export const searchPatients = (query) => api.get(`/patients/search`, { params: { q: query } });

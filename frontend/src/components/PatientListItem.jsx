@@ -1,32 +1,32 @@
 import React from 'react';
-import { Link } from 'react-router-dom'; // Make sure Link is imported
+import { Link } from 'react-router-dom';
 
 const PatientListItem = ({ patient, onDelete }) => {
-    // Modify handleDelete to accept the event object
-    const handleDelete = async (e) => {
-        e.stopPropagation(); // Prevents the Link from being triggered
-        e.preventDefault(); // Prevents any default browser action
+  return (
+    <div className="bg-white shadow-md rounded-xl p-5 border border-gray-100 hover:shadow-lg transition">
+      <h2 className="text-lg font-semibold text-gray-800 mb-2">
+        {patient.name}
+      </h2>
+      <p className="text-sm text-gray-500 mb-4">
+        Date of Birth: {patient.dob}
+      </p>
 
-        if (window.confirm(`Are you sure you want to delete patient ${patient.name}? This action cannot be undone.`)) {
-            await onDelete(patient.id);
-        }
-    };
-
-    return (
-        // Wrap the whole card in a Link component
-        <Link to={`/patients/${patient.id}`} className="patient-card-link">
-            <div className="patient-card">
-                <div>
-                    <h4>{patient.name}</h4>
-                    <p>DOB: {patient.dob}</p>
-                </div>
-                {/* The onClick now passes the event 'e' to the handler */}
-                <button className="delete-button" onClick={handleDelete}>
-                    Delete
-                </button>
-            </div>
+      <div className="flex justify-between items-center">
+        <Link
+          to={`/patients/${patient.id}`}
+          className="text-blue-600 hover:text-blue-800 font-medium transition"
+        >
+          View Details →
         </Link>
-    );
+        <button
+          onClick={() => onDelete(patient.id)}
+          className="text-red-500 hover:text-red-700 font-medium transition"
+        >
+          Delete
+        </button>
+      </div>
+    </div>
+  );
 };
 
 export default PatientListItem;
