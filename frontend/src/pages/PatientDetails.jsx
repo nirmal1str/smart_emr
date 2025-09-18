@@ -35,7 +35,7 @@ const PatientDetails = () => {
     const [summary, setSummary] = useState('');
     const [summaryLoading, setSummaryLoading] = useState(false);
 
-    const [analysis, setAnalysis] = useState(null); // Now stores the chart data object
+    const [analysis, setAnalysis] = useState(null);
     const [analysisLoading, setAnalysisLoading] = useState(false);
 
     useEffect(() => {
@@ -102,7 +102,6 @@ const PatientDetails = () => {
         setAnalysis(null);
         try {
             const response = await getPredictiveAnalysis(patientId);
-            // The AI returns a JSON string, so we need to parse it
             const parsedData = JSON.parse(response.data.analysis);
             setAnalysis(parsedData);
         } catch (err) {
@@ -134,24 +133,24 @@ const PatientDetails = () => {
             title: {
                 display: true,
                 text: 'Patient Health Trend Over Time',
-                color: 'rgb(156, 163, 175)', // Dark mode title color
+                color: 'rgb(156, 163, 175)',
             },
         },
         scales: {
             x: {
                 ticks: {
-                    color: 'rgb(156, 163, 175)', // Dark mode x-axis labels
+                    color: 'rgb(156, 163, 175)',
                 },
                 grid: {
-                    color: 'rgba(255, 255, 255, 0.1)', // Dark mode grid lines
+                    color: 'rgba(255, 255, 255, 0.1)',
                 }
             },
             y: {
                 ticks: {
-                    color: 'rgb(156, 163, 175)', // Dark mode y-axis labels
+                    color: 'rgb(156, 163, 175)',
                 },
                 grid: {
-                    color: 'rgba(255, 255, 255, 0.1)', // Dark mode grid lines
+                    color: 'rgba(255, 255, 255, 0.1)',
                 }
             }
         }

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Dashboard from './pages/Dashboard';
-import CreatePatient from './pages/CreatePatient';
 import PatientDetails from './pages/PatientDetails';
+import CreatePatient from './pages/CreatePatient';
 
 function App() {
   const [theme, setTheme] = useState(
@@ -29,6 +29,10 @@ function App() {
           {theme === 'dark' ? '☀️' : '🌙'}
         </button>
         <main className="transition-opacity duration-500 ease-in-out">
+          {/* Your original heading */}
+          <h1 className="text-4xl font-bold text-blue-600">
+          </h1>
+
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/patients/:patientId" element={<PatientDetails />} />
