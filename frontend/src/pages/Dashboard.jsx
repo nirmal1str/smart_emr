@@ -1,44 +1,48 @@
 import React, { useEffect, useState } from 'react';
-// We might need to adjust these import paths based on your teammate's file structure
 import PatientListItem from '../components/PatientListItem'; 
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
 import { Link } from 'react-router-dom';
+import { getPatients, deletePatient } from '../api/apiService'; // Import your api functions
 
 const Dashboard = () => {
   const [patients, setPatients] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // This useEffect hook runs once when the component first loads
   useEffect(() => {
     const fetchPatients = async () => {
       try {
-        // ** THE MAGIC HAPPENS HERE **
-        // We are calling your backend API to get the real patient list.
-        // Note: We use the full URL because the frontend and backend are on different ports.
-        const response = await fetch('http://127.0.0.1:5000/api/patients');
-        
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-
-        const data = await response.json();
-        setPatients(data); // Set the state with the real data from the backend
-        
+        // Using the apiService for consistency
+        const response = await getPatients();
+        setPatients(response.data);
       } catch (err) {
-        // If the API call fails, we set an error message
         setError("Failed to fetch patients. Make sure the backend server is running.");
       } finally {
-        // This runs whether the call succeeds or fails
         setLoading(false);
       }
     };
 
     fetchPatients();
-  }, []); // The empty array [] means this effect runs only once on mount
+  }, []);
 
-  // Conditional rendering based on the state
+  // --- NEW HANDLER FUNCTION ---
+  const handleDeletePatient = async (patientId) => {
+    try {
+      // 1. Call the API to delete the patient from the database
+      await deletePatient(patientId);
+      
+      // 2. Update the UI state to remove the patient without a page refresh
+      setPatients(currentPatients =>
+        currentPatients.filter(patient => patient.id !== patientId)
+      );
+    } catch (err) {
+      console.error("Failed to delete patient:", err);
+      // Optionally set an error message to show the user
+      setError("Failed to delete patient. Please try again.");
+    }
+  };
+
   if (loading) {
     return <LoadingSpinner />;
   }
@@ -58,7 +62,12 @@ const Dashboard = () => {
       <div className="patient-grid">
         {patients.length > 0 ? (
           patients.map(patient => (
-            <PatientListItem key={patient.id} patient={patient} />
+            <PatientListItem 
+              key={patient.id} 
+              patient={patient}
+              // --- PASSING THE FUNCTION AS A PROP ---
+              onDelete={handleDeletePatient} 
+            />
           ))
         ) : (
           <p style={{ color: '#6b7280' }}>No patients found. Add a new one to get started!</p>

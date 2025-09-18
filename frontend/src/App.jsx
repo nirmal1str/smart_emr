@@ -1,37 +1,23 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Dashboard from './pages/Dashboard';
 import PatientDetails from './pages/PatientDetails';
-import CreatePatient from './pages/CreatePatient';
-import { FaUserMd, FaPlus } from 'react-icons/fa';
+import CreatePatient from './pages/CreatePatient'; // 1. Import the component
 
-const App = () => {
+function App() {
   return (
     <Router>
-      <div className="app-container">
-        <header className="header">
-          <Link to="/" className="header-logo">
-            <FaUserMd style={{ marginRight: '0.5rem' }} /> EMR App
-          </Link>
-          <nav>
-            <Link to="/" className="nav-link">
-              Dashboard
-            </Link>
-            <Link to="/create-patient" className="nav-button">
-              <FaPlus style={{ marginRight: '0.5rem' }} /> New Patient
-            </Link>
-          </nav>
-        </header>
-        <main>
-          <Routes>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/create-patient" element={<CreatePatient />} />
-            <Route path="/patients/:patientId" element={<PatientDetails />} />
-          </Routes>
-        </main>
-      </div>
+      <main>
+        <Routes>
+          <Route path="/" element={<Dashboard />} />
+          <Route path="/patients/:patientId" element={<PatientDetails />} />
+          
+          {/* 2. Add this new route for the create patient page */}
+          <Route path="/create-patient" element={<CreatePatient />} />
+        </Routes>
+      </main>
     </Router>
   );
-};
+}
 
 export default App;

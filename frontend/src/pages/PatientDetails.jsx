@@ -1,143 +1,97 @@
-import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { getPatientDetails, addClinicalNote, getAiSummary } from '../api/apiService';
+import React, { useState, useEffect } from 'react';
+import { useParams, Link } from 'react-router-dom';
+import { getPatientDetails, addClinicalNote } from '../api/apiService'; // Import addClinicalNote
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
 
 const PatientDetails = () => {
-  const { patientId } = useParams();
-  const [patient, setPatient] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [noteContent, setNoteContent] = useState('');
-  const [summary, setSummary] = useState('');
-  const [isAddingNote, setIsAddingNote] = useState(false);
-  const [isFetchingSummary, setIsFetchingSummary] = useState(false);
+    const { patientId } = useParams();
+    const [patient, setPatient] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [newNote, setNewNote] = useState(''); // State for the textarea input
 
-  useEffect(() => {
-    const fetchPatientData = async () => {
-      try {
-        const response = await getPatientDetails(patientId);
-        setPatient(response.data);
-        setLoading(false);
-      } catch (err) {
-        setError("Failed to fetch patient details. The patient might not exist.");
-        setLoading(false);
-      }
-    };
-    fetchPatientData();
-  }, [patientId]);
+    useEffect(() => {
+        const fetchPatient = async () => {
+            try {
+                const response = await getPatientDetails(patientId);
+                setPatient(response.data);
+            } catch (err) {
+                setError("Failed to fetch patient details.");
+            } finally {
+                setLoading(false);
+            }
+        };
 
-  const handleAddNote = async (e) => {
-    e.preventDefault();
-    if (!noteContent.trim()) return;
+        fetchPatient();
+    }, [patientId]);
 
-    setIsAddingNote(true);
-    try {
-      const response = await addClinicalNote(patientId, noteContent);
-      setPatient(currentPatient => ({
-        ...currentPatient,
-        notes: [...currentPatient.notes, response.data]
-      }));
+    // --- NEW: Function to handle form submission ---
+    const handleNoteSubmit = async (e) => {
+        e.preventDefault(); // Prevent page reload
+        if (newNote.trim() === '') return; // Don't submit empty notes
 
-      setNoteContent(''); 
-    } catch (err) {
-      alert("Failed to add note.");
-    } finally {
-      setIsAddingNote(false);
-    }
-};
-
-  const handleGetSummary = async () => {
-    setIsFetchingSummary(true);
-    try {
-      const response = await getAiSummary(patientId);
-      setSummary(response.data.summary);
-      setIsFetchingSummary(false);
-    } catch (err) {
-      alert("Failed to get AI summary.");
-      setIsFetchingSummary(false);
-    }
-  };
-
-  if (loading) return <LoadingSpinner />;
-  if (error) return <div className="container"><ErrorMessage message={error} /></div>;
-  if (!patient) return null;
-
-  return (
-    <div className="container" style={{ maxWidth: '960px' }}>
-      <div className="card" style={{ marginBottom: '1.5rem', padding: '1.5rem' }}>
-        <h1 style={{ fontSize: '1.875rem', fontWeight: 'bold', color: '#1f2937' }}>{patient.name}</h1>
-        <p style={{ color: '#4b5563', marginTop: '0.5rem' }}>Date of Birth: {patient.dob}</p>
-      </div>
-
-      <div className="card" style={{ marginBottom: '1.5rem', padding: '1.5rem' }}>
-        <h2 style={{ fontSize: '1.5rem', fontWeight: '600', marginBottom: '1rem', color: '#1f2937' }}>Clinical Notes</h2>
-        <form onSubmit={handleAddNote} style={{ marginBottom: '1rem' }}>
-          <textarea
-            value={noteContent}
-            onChange={(e) => setNoteContent(e.target.value)}
-            className="form-textarea"
-            rows="4"
-            placeholder="Add a new clinical note..."
-            disabled={isAddingNote}
-          />
-          <button
-            type="submit"
-            className="btn btn-primary"
-            style={{ marginTop: '0.5rem' }}
-            disabled={isAddingNote}
-          >
-            {isAddingNote ? 'Adding...' : 'Add Note'}
-          </button>
-        </form>
-        <ul className="notes-list" style={{ marginTop: '1rem', padding: '0' }}>
-          {patient && patient.notes && patient.notes.length > 0 ? (
-            patient.notes.map((note, index) => (
-              <li key={index} className="note-item" style={{ marginBottom: '0.5rem' }}>
-                <p style={{ color: '#374151' }}>{note.content}</p>
-              </li>
-            ))
-          ) : (
-            <p style={{ color: '#6b7280' }}>No clinical notes available.</p>
-          )}
-        </ul>
-      </div>
-
-      <div className="card" style={{ padding: '1.5rem' }}>
-        <h2 style={{ fontSize: '1.5rem', fontWeight: '600', marginBottom: '1rem', color: '#1f2937' }}>AI Summary</h2>
-        <button
-          onClick={handleGetSummary}
-          className="btn btn-secondary"
-          disabled={isFetchingSummary}
-        >
-          {isFetchingSummary ? 'Generating...' : 'Generate AI Summary'}
-        </button>
-        {summary && (
-          <div style={{ marginTop: '1rem', padding: '1rem', backgroundColor: '#f3f4f6', borderRadius: '0.5rem' }}>
-            <p style={{ color: '#374151' }}>{summary}</p>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-};
-
-
-const handleDeleteNote = async (noteId) => {
-    if (window.confirm('Are you sure you want to delete this note?')) {
         try {
-            await apiService.deleteNote(patientId, noteId);
-            setNotes(notes.filter(note => note.id !== noteId));
-        } catch (error) {
-            console.error('Failed to delete note:', error);
+            const response = await addClinicalNote(patientId, newNote);
+            // Add the new note to the patient's notes in the state to update the UI instantly
+            setPatient(prevPatient => ({
+                ...prevPatient,
+                notes: [...prevPatient.notes, response.data]
+            }));
+            setNewNote(''); // Clear the textarea
+        } catch (err) {
+            console.error("Failed to add note:", err);
+            setError("Could not save the new note. Please try again.");
         }
-    }
-};
+    };
 
-// ... inside the return statement, inside the notes.map(), add this button
-<button className="delete-note-button" onClick={() => handleDeleteNote(note.id)}>
-    Delete Note
-</button>
+    if (loading) return <LoadingSpinner />;
+    if (error) return <div className="container"><ErrorMessage message={error} /></div>;
+    if (!patient) return <div className="container"><p>Patient not found.</p></div>;
+
+    return (
+        <div className="container">
+            <div className="page-header">
+                <div>
+                    <h1 className="page-title">{patient.name}</h1>
+                    <p className="page-subtitle">Date of Birth: {patient.dob}</p>
+                </div>
+                <Link to="/" className="nav-button-secondary">
+                    ← Back to All Patients
+                </Link>
+            </div>
+
+            <div className="notes-section">
+                <h2>Clinical Notes</h2>
+                {/* --- NEW: The form for adding a new note --- */}
+                <form onSubmit={handleNoteSubmit} className="note-form">
+                    <textarea
+                        value={newNote}
+                        onChange={(e) => setNewNote(e.target.value)}
+                        placeholder="Add a new clinical note..."
+                        className="note-textarea"
+                        rows="4"
+                    />
+                    <button type="submit" className="nav-button">
+                        Save Note
+                    </button>
+                </form>
+
+                {/* --- Existing list of notes --- */}
+                {patient.notes && patient.notes.length > 0 ? (
+                    <ul className="notes-list">
+                        {patient.notes.map(note => (
+                            <li key={note.id} className="note-item">
+                                {note.content}
+                            </li>
+                        ))}
+                    </ul>
+                ) : (
+                    <p>No clinical notes have been added for this patient.</p>
+                )}
+            </div>
+        </div>
+    );
+};
 
 export default PatientDetails;
