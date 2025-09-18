@@ -1,24 +1,52 @@
-# 🚀 Smart EMR Hackathon Project
+This is the API contract for the Smart EMR backend.
 
-This project is an AI-powered Electronic Medical Record system.
+**Base URL:** `/`
 
-### MVP GOAL:
-1.  Add & View Patients.
-2.  Log clinical notes for each patient.
-3.  Generate an AI-powered summary of a patient's history.
+# Patients
 
----
+* **GET `/api/patients`**
+    * **Description:** Retrieves a list of all patients.
+    * **Success Response (200 OK):**
+        ```json
+        [
+            {
+                "id": 1,
+                "name": "John Doe",
+                "dob": "1990-01-15",
+                "notes": []
+            }
+        ]
+        ```
 
-### TEAM ROLES:
+* **POST `/api/patients`**
+    * **Description:** Creates a new patient.
+    * **Request Body (JSON):**
+        ```json
+        {
+            "name": "Jane Doe",
+            "dob": "1992-03-20"
+        }
+        ```
+    * **Success Response (201 Created):** Returns the newly created patient object.
+    * **Error Response (400 Bad Request):** If name or dob are missing/empty.
 
-* **Person 1 (Backend Architect ⚙️):** You, Nirmal.
-    * **Focus:** 
-    * **Task:** Build the Flask server, database models (Patient, Note), and all API endpoints.
+# Notes
 
-* **Person 2 (Frontend Designer 🎨):** [Teammate's Name]
-    * **Focus:**  and  folders.
-    * **Task:** Write the HTML and CSS for the user interface.
+* **POST `/api/patients/<patient_id>/notes`**
+    * **Description:** Adds a new clinical note for a specific patient.
+    * **Request Body (JSON):**
+        ```json
+        {
+            "content": "Patient reports mild headache."
+        }
+        ```
+    * **Success Response (201 Created):** Returns the newly created note object.
 
-* **Person 3 (Integrator & AI Specialist 🔌):** [Teammate's Name]
-    * **Focus:** JavaScript inside the  files and the AI endpoint in .
-    * **Task:** Connect the frontend to the backend API and implement the OpenAI summarization feature.
+* **GET `/api/patients/<patient_id>/summary`**
+    * **Description:** Generates an AI-powered summary of all notes for a specific patient.
+    * **Success Response (200 OK):**
+        ```json
+        {
+            "summary": "The patient presents with a mild headache..."
+        }
+        ```
