@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Details</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <a href="/">&larr; Back to Dashboard</a>
+        <h1 id="patient-name">Loading...</h1>
+        <p id="patient-dob"></p>
+
+        <div class="card">
+            <h2>🤖 AI Summary</h2>
+            <button id="summarize-btn">Generate Summary</button>
+            <div id="summary-output" class="summary-box">Click the button to generate a summary...</div>
+        </div>
+
+        <div class="card">
+            <h2>Add Clinical Note</h2>
+            <form id="add-note-form">
+                <textarea id="note-content" placeholder="Enter new clinical note..." required></textarea>
+                <button type="submit">Add Note</button>
+            </form>
+        </div>
+
+        <div class="card">
+            <h2>Clinical Notes History</h2>
+            <ul id="notes-list">
+                </ul>
+        </div>
+    </div>
+
+    <script>
+        const patientId = {{ patient_id }};
+
+        async function loadPatientData() {
+            const response = await fetch(`/api/patients/${patientId}`);
+            const patient = await response.json();
+
+            document.getElementById('patient-name').textContent = patient.name;
+            document.getElementById('patient-dob').textContent = `Date of Birth: ${patient.dob}`;
+
+            const notesList = document.getElementById('notes-list');
+            notesList.innerHTML = '';
+            patient.notes.forEach(note => {
+                const li = document.createElement('li');
+                li.textContent = note.content;
+                notesList.appendChild(li);
+            });
+        }
+
+        document.getElementById('add-note-form').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const content = document.getElementById('note-content').value;
+
+            await fetch(`/api/patients/${patientId}/notes`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ content })
+            });
+            this.reset();
+            loadPatientData();
+        });
+
+        document.getElementById('summarize-btn').addEventListener('click', async function() {
+            const summaryOutput = document.getElementById('summary-output');
+            summaryOutput.textContent = '🧠 Generating summary...';
+            this.disabled = true;
+
+            const response = await fetch(`/api/patients/${patientId}/summary`);
+            const data = await response.json();
+
+            summaryOutput.textContent = data.summary || data.error;
+            this.disabled = false;
+        });
+
+        loadPatientData();
+    </script>
+</body>
+</html>
